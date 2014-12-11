@@ -7,8 +7,9 @@ echo "## Date: 11/07/14"
 echo "################################################"
 
 shopt -s nocasematch
-echo -e "\nThis script will place a script in cron.daily that will send an email when any"
-echo "disk in the system exceeds 90% usage. Would you like to continue? (y/n)>"
+echo -e "\nThis script will place a script called disk_usage.sh in cron.daily"
+echo "that will send an email when any disk in the system exceeds 90% usage."
+echo "Would you like to continue? (y/n)>"
 read answer
 case "$answer" in
 y|yes )

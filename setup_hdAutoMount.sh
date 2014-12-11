@@ -18,7 +18,7 @@ y|yes )
 	if [[ $(whoami) = "root" ]]; then
 		echo "---Installed disks that are not currently mounted---"
 		ls -l /dev/disk/by-uuid | awk '/^l/{print "/dev/"substr($11,7,length($11))}' | xargs lsblk | awk '{if($1~/^NAME/)print $1"\t"$4; else if($7!~/./)print $1"\t"$4;}'
-		echo "Please type the name of the disk that you would like to automount exactly as it apears above"
+		echo "Please type the name of the disk that you would like to automount exactly as it appears above"
 		echo "or type q to quit. >"
 		read part
 		if [[ $part != "q" ]]; then
