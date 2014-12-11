@@ -30,6 +30,7 @@ y|yes )
 		fi
 	done" > /etc/cron.daily/disk_usage.sh
 	chmod +x /etc/cron.daily/disk_usage.sh
+	echo "/etc/cron.daily/disk_usage.sh file created"
 	;;
 * )
 	echo "Exiting without changes..."
