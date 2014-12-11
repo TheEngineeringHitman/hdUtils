@@ -18,24 +18,29 @@ y|yes )
 	if [[ $(whoami) = "root" ]]; then
 		echo "---Installed disks that are not currently mounted---"
 		ls -l /dev/disk/by-uuid | awk '/^l/{print "/dev/"substr($11,7,length($11))}' | xargs lsblk | awk '{if($1~/^NAME/)print $1"\t"$4; else if($7!~/./)print $1"\t"$4;}'
-		echo "Please type the name of the disk that you would like to automount exactly as it apears above. >"
+		echo "Please type the name of the disk that you would like to automount exactly as it apears above"
+		echo "or type q to quit. >"
 		read part
-		disk="/dev/"$part
-		echo "Please enter the full path to mount the disk to. >"
-		read dir
-		uuid=$(file -sL $disk | awk '{if($0!~/ERROR/)print $9;}')
-		fs_type=$(file -sL $disk | awk '{if($0!~/ERROR/)print $6;}')
-		if [[ "$uuid" = "" ]]; then
-			echo "Disk not found. Exiting."
-		else
-			if [[ ! -d "$dir" ]]; then
-				mkdir -p $dir;
+		if [[ $part != "q" ]]; then
+			disk="/dev/"$part
+			echo "Please enter the full path to mount the disk to. >"
+			read dir
+			uuid=$(blkid | awk -v disk="$disk" '//{if($0 ~ disk)print substr($2,7,length($2)-7)}')
+			fs_type=$(blkid | awk -v disk="$disk" '//{if($0 ~ disk) print substr($3,7,length($3)-7)}')
+			if [[ "$uuid" = "" ]]; then
+				echo "Disk not found. Exiting."
+			else
+				if [[ ! -d "$dir" ]]; then
+					mkdir -p $dir;
+				fi
+				echo "Updating /etc/fstab..."
+				echo -e "UUID="$uuid"\t"$dir"\t"$fs_type"\tdefaults,noatime\t0\t0" >> /etc/fstab
+				echo "Mounting all drives in /etc/fstab..."
+				mount -all
+				echo "Done."
 			fi
-			echo "Updating /etc/fstab..."
-			echo -e $uuid"\t"$dir"\t"$fs_type"\tdefaults,noatime\t0\t0" >> /etc/fstab
-			echo "Mounting all drives in /etc/fstab..."
-			mount -all
-			echo "Done."
+		else
+			echo "Exiting without changes."
 		fi
 	else
 		echo "This script must be run as root. Please try again using sudo."
