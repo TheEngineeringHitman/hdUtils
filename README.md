@@ -1,4 +1,4 @@
 hdUtils
 =======
 
-Scripts to help with auto mounting and monitoring hardd rives with the Raspberry pi
+Scripts to help with auto mounting and monitoring hard drives with the Raspberry pi
