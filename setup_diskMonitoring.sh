@@ -16,19 +16,14 @@ y|yes )
 	echo "Enter the email address to report disk usage to. >"
 	read email
 	
-	echo "
-	#!/bin/bash
+	echo "#!/bin/bash
 	
-	NOTIFYEMAIL="$email"
-	df -H | awk '/\/var\/www/{print $5 \" \" $1 }' | while read output;
-	do
-		echo \$output
-		usep=\$(echo $output | awk '{print \$1}' | cut -d'%' -f1 )
-		partition=\$(echo \$output | awk '{print \$2 }' )
-		if [[ \$usep -ge 90 ]]; then
-			echo \"Running out of space \\\"\$partition (\$usep%)\\\" on \$(hostname) as of \$(date)\" | mail -s \"Alert: Almost out of disk space \$usep%\" \$NOTIFYEMAIL
-		fi
-	done" > /etc/cron.daily/disk_usage.sh
+NOTIFYEMAIL="$email"
+full_drives=\$(df -h | awk '//{if((\$5!~/Use/)&&(substr(\$5,0,length(\$5)) > 90)){print \"WARNING! Partition \"\$6\" is at \"\$5\" usage.\"}}')
+if [[ \$full_drives ]]; then
+	echo \"\$full_drives\" | mail -s \"Alert: Almost out of disk space on \$HOSTNAME\" \$NOTIFYEMAIL
+fi
+	" > /etc/cron.daily/disk_usage.sh
 	chmod +x /etc/cron.daily/disk_usage.sh
 	echo "/etc/cron.daily/disk_usage.sh file created"
 	;;
@@ -37,3 +32,4 @@ y|yes )
 	;;
 esac
 shopt -u nocasematch
+#!/bin/bash
